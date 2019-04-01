@@ -1,3 +1,73 @@
 #+TITLE: Biber: Crawl bib from CS conferences
 
+** support major CS conferences
+
+It cost time to download html and generate bib files. You can also
+download the final bib files
+https://github.com/lihebi/smart-scholar-dist
+
+AI conferences
+- [X] NIPS
+- [X] ICML
+- [X] ICLR
+- [ ] neurocomputing https://www.sciencedirect.com/journal/neurocomputing
+
+
+- ICLR index: https://iclr.cc/archive/index.html
+- 2013: https://iclr.cc/archive/2013/conference-proceedings.html
+- 2014: https://iclr.cc/archive/2014/conference-proceedings/
+- 2015: https://iclr.cc/archive/www/doku.php%3Fid=iclr2015:accepted-main.html
+- 2016: https://iclr.cc/archive/www/doku.php%3Fid=iclr2016:accepted-main.html
+- open review index: https://openreview.net/group?id=ICLR.cc
+  - TODO workshops
+- 2013 open review: https://openreview.net/group?id=ICLR.cc/2013
+- 2017 open review: https://openreview.net/group?id=ICLR.cc/2017/conference
+- 2018 open review: https://openreview.net/group?id=ICLR.cc/2018/Conference
+- 2019 open reviwe: https://openreview.net/group?id=ICLR.cc/2019/Conference
+
+
+Neural Science
+
+Robotics
+- [X] ICRA: International Conference on Robotics and Automation
+- [X] TRO: IEEE Transactions on Robotics
+- [ ] ICAPS: International Conference on Automated Planning and Scheduling
+- [X] IROS: IEEE/RSJ International Conference on Intelligent Robots and Systems
+
+Image Processing
+- [X] CVPR
+- [X] ICCV
+- [X] ECCV
+
+NLP:
+- [X] CL
+- [X] ACL
+- [X] EACL
+- [X] NAACL
+- [X] EMNLP
+
+Programming Language:
+- [X] PLDI
+- [X] POPL
+
+System:
+- [X] SOSP
+- [X] OSDI
+
+Quantum Computing: TODO
+
+For each of them, the package will manage
+- crawl the website for a bib file list, for each year
+- for each bib entry, figure out what is the pdf link
+- download pdfs automatically, in background
+- do all these at once
+
+Also, I noticed that downloading htmls and pdfs from publishers
+website is likely to be very slow, due to the visit limit of the
+publishers. Thus, I might want to store a git mirror of all webpages
+of these conferences. There might be copyright issues, but I think for
+webpages that is fine.
+
+The pdf cannot be mirrored: they are too large and has copyright
+concern.
 
