@@ -1,5 +1,16 @@
 #+TITLE: Biber: Crawl bib from CS conferences
 
+* Install
+
+Racket packages:
+
+#+BEGIN_EXAMPLE
+raco pkg install html-parsing sxml roman-numeral sha
+#+END_EXAMPLE
+
+
+* Features
+
 ** support major CS conferences
 
 It cost time to download html and generate bib files. You can also
