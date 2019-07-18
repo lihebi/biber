@@ -27,12 +27,17 @@
 (define (gen-icml year)
   (case year
     [(2019) (pmlr-bib 97 "ICML" 2019)]))
+
+(define (gen-aistats year)
+  (case year
+   [(2019) (pmlr-bib 89 "AISTATS" 2019)]))
  
 
 ;; tests
-(define (test)
+(module+ test
 
   (parameterize ([BIBDIR "/home/hebi/github/biber-dist/"])
-   (gen-bib-and-write "ICML" 2019 gen-icml))
+    (gen-bib-and-write "ICML" 2019 gen-icml)
+    (gen-bib-and-write "AISTATS" 2019 gen-aistats))
 
   )

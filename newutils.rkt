@@ -83,12 +83,20 @@
                        "Title")
       (string-titlecase (first words))))
 
+
+(define (clean-id id)
+  (string-replace id "’" ""))
+
+(module+ test
+  (clean-id "2019-AISTATS-D’Amour-Multi"))
+
 (define (gen-single-bib p)
-  (define id (string-join (list (number->string (paper-year p))
-                                (paper-booktitle p)
-                                (last (string-split (first (paper-authors p))))
-                                (title-first-word (paper-title p)))
-                          "-"))
+  (define id (clean-id
+              (string-join (list (number->string (paper-year p))
+                                 (paper-booktitle p)
+                                 (last (string-split (first (paper-authors p))))
+                                 (title-first-word (paper-title p)))
+                           "-")))
   (define author (string-join (paper-authors p) ", "))
   (define year (paper-year p))
   (string-append "@inproceedings{" id ",\n"
@@ -100,12 +108,14 @@
 
 (define BIBDIR (make-parameter "bib"))
 
-(define (gen-bib-and-write conf year bibfunc)
+(define (gen-bib-and-write conf year bibfunc #:overwrite [overwrite #f])
   (define bibdir (string-append (BIBDIR) "/" conf))
   (when (not (file-exists? bibdir))
     (make-directory* bibdir))
   (let ([f (string-append bibdir "/" conf "-" (number->string year) ".bib")])
-    (when (not (file-exists? f))
+    (when (or (not (file-exists? f))
+              overwrite)
       (displayln (format "Writing to ~a ..." f))
       (with-output-to-file f
-        (λ () (displayln (bibfunc year)))))))
+        (λ () (displayln (bibfunc year)))
+        #:exists 'replace))))

@@ -17,6 +17,12 @@ pip3 install --user beautifulsoup4 lxml
 
 * Features
 
+** New conferences
+- [X] ICML 19: http://proceedings.mlr.press/v97/
+- [X] AISTATS 19: http://proceedings.mlr.press/v89/
+- [ ] IJCAI 19
+- [ ] CVPR 19
+
 ** support major CS conferences
 
 It cost time to download html and generate bib files. You can also
