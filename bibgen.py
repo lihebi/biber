@@ -56,10 +56,16 @@ def download_file(url, filename):
 
 def download_pdf(url, filename):
     print('downloading to ' + filename + ' ..')
-    r = requests.get(url)
+    # ACM is checking user agent
+    user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+    headers = {'User-Agent': user_agent}
+    r = requests.get(url,headers=headers)
+    # r = requests.get(url)
     with open(filename, 'wb') as f:
         f.write(r.content)
-                
+
+def __test():
+    download_pdf("http://dl.acm.org/ft_gateway.cfm?id=2677013&ftid=1522763&dwn=1", "test.pdf")
 
 def download_bib_pdfs(bib_file):
     ids = []
