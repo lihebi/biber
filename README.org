@@ -8,6 +8,12 @@ Racket packages:
 raco pkg install html-parsing sxml roman-numeral sha
 #+END_EXAMPLE
 
+Python packages:
+
+#+BEGIN_EXAMPLE
+pip3 install --user beautifulsoup4 lxml
+#+END_EXAMPLE
+
 
 * Features
 

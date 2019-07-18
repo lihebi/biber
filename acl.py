@@ -17,10 +17,10 @@ def acl_conference_bib(year, conf, link):
     # soup.select('#content p')[3].select('a[href^=/people]')
     
     # len(soup.select('#content p'))
-    for p in soup.select('#content p'):
+    for p in soup.select('#main p'):
         strong = p.strong
         title = strong.a.get_text()
-        authors = [a.get_text() for a in p.select('a[href^=/people]')]
+        authors = [a.get_text() for a in p.select('a[href^="/anthology/people"]')]
         if authors:
             pdflink = p.a['href']
             id = gen_id(year, conf, authors, title)
@@ -51,3 +51,6 @@ def emnlp_bib(year):
 
 if __name__ == '__hebi__':
     bib = acl_conference_bib(2018, 'ACL', 'https://aclanthology.info/events/acl-2018')
+    bib = acl_conference_bib(2019, 'ACL', 'https://aclanthology.info/events/acl-2019')
+
+    bib = acl_bib(2017)
