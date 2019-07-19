@@ -21,7 +21,7 @@ pip3 install --user beautifulsoup4 lxml
 - [X] ICML 19: http://proceedings.mlr.press/v97/
 - [X] AISTATS 19: http://proceedings.mlr.press/v89/
 - [ ] IJCAI 19
-- [ ] CVPR 19
+- [X] CVPR 19: http://openaccess.thecvf.com/CVPR2019.py
 
 ** support major CS conferences
 
