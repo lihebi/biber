@@ -21,12 +21,13 @@
     (close-input-port in)))
 
 (define (string-hash str)
-  (bytes->hex-string (sha1-bytes (open-input-string str))))
+  (string-append (bytes->hex-string (sha1-bytes (open-input-string str)))
+                 "-" (string-replace str "/" "-")))
 
 (define controlled-port->string
-  ;; There is a speed control parameter. By default it is 5/15
+  ;; There is a speed control parameter. By default it is 3/15
   ;; seconds.
-  (let ([num 5]
+  (let ([num 3]
         [sec-limit 15])
     (let ([l (make-list num 0)])
       (lambda (in)
@@ -37,7 +38,7 @@
             (sleep (- sec-limit cur-secs))))
         (begin0
             (port->string in)
-          (set! l (take-right (append l (list current-seconds)) num)))))))
+          (set! l (take-right (append l (list (current-seconds))) num)))))))
 
 (define (open-url-port url)
   ;; hash the url
