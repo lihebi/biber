@@ -11,6 +11,7 @@
          gen-single-bib
          paper
          gen-bib-and-write
+         gen-bib-and-write-arxiv
          BIBDIR)
 
 
@@ -115,7 +116,26 @@
   (let ([f (string-append bibdir "/" conf "-" (number->string year) ".bib")])
     (when (or (not (file-exists? f))
               overwrite)
-      (displayln (format "Writing to ~a ..." f))
-      (with-output-to-file f
-        (λ () (displayln (bibfunc year)))
-        #:exists 'replace))))
+      (displayln "Generating bib ..")
+      (let ([output (bibfunc year)])
+        (displayln (format "Writing to ~a ..." f))
+        (with-output-to-file f
+          (λ () (displayln output))
+          #:exists 'replace)))))
+
+(define (gen-bib-and-write-arxiv cat year month bibfunc #:overwrite [overwrite #f])
+  (define bibdir (string-append (BIBDIR) "/" cat))
+  (when (not (file-exists? bibdir))
+    (make-directory* bibdir))
+  (let ([f (string-append bibdir "/" cat "-" (number->string year) "-"
+                          (~a month
+                              #:width 2 #:pad-string "0" #:align 'right)
+                          ".bib")])
+    (when (or (not (file-exists? f))
+              overwrite)
+      (displayln "Generating bib ..")
+      (let ([output (bibfunc cat year month)])
+        (displayln (format "Writing to ~a ..." f))
+        (with-output-to-file f
+          (λ () (displayln output))
+          #:exists 'replace)))))

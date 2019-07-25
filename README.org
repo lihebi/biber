@@ -20,8 +20,9 @@ pip3 install --user beautifulsoup4 lxml
 ** New conferences
 - [X] ICML 19: http://proceedings.mlr.press/v97/
 - [X] AISTATS 19: http://proceedings.mlr.press/v89/
-- [ ] IJCAI 19
+- [ ] IJCAI 19: August 10-16 https://www.ijcai19.org/accepted-papers.html
 - [X] CVPR 19: http://openaccess.thecvf.com/CVPR2019.py
+- [X] arXiv
 
 ** support major CS conferences
 
@@ -34,6 +35,7 @@ AI conferences
 - [X] ICML
 - [X] ICLR
 - [ ] neurocomputing https://www.sciencedirect.com/journal/neurocomputing
+- [ ] HotOS
 
 
 - ICLR index: https://iclr.cc/archive/index.html
