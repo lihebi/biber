@@ -87,7 +87,10 @@
 
 
 (define (clean-id id)
-  (string-replace id "’" ""))
+  (string-replace id #rx"’|\\+" ""))
+
+(module+ test
+  (clean-id "’hello+"))
 
 (module+ test
   (clean-id "2019-AISTATS-D’Amour-Multi"))
