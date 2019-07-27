@@ -110,6 +110,38 @@
                      (paper title author pdflink cat year))))
   (string-join (map gen-single-bib papers) "\n"))
 
+(define (xexp-get-all-text x)
+    (match x
+      [(list '@ child ...) ""]
+      [(list name child ...) (string-join (map xexp-get-all-text child) "")]
+      [s s]))
+
+(define (acl-bib conf year)
+  (define acl-prefix "https://aclanthology.info/events/")
+  (define suffix (string-append (string-downcase conf) "-" (number->string year)))
+  (define url (string-append acl-prefix suffix))
+  (define xexp (port->xexp (open-url-port url)))
+
+  (define paper-xexps ((sxpath "//div[@id='n19-1']/p") xexp))
+
+  (let ([titles (map (λ (x)
+                       (string-join (map xexp-get-all-text ((sxpath "//span/strong/a") x)) ""))
+                     paper-xexps)]
+        [authors (map (λ (x) ((sxpath "//span[2]/a/text()") x))
+                      paper-xexps)]
+        [pdflinks (map (λ (x) (first ((sxpath "//span[1]/a[1]/@href/text()") x)))
+                       paper-xexps)])
+    (define papers (for/list ([pdflink pdflinks]
+                              [title titles]
+                              [author authors])
+                     (paper title author pdflink conf year)))
+    (string-join (map gen-single-bib papers) "\n")))
+
+(define (gen-naacl year)
+  (case year
+    [(2019) (acl-bib "NAACL" 2019)]))
+
+
 ;; tests
 (module+ test
 
@@ -139,6 +171,8 @@
       (gen-bib-and-write-arxiv "cs.AI" 2018 m arxiv-bib))
     (for ([m (in-range 1 7)])
       (gen-bib-and-write-arxiv "cs.AI" 2019 m arxiv-bib))
+
+    (gen-bib-and-write "NAACL" 2019 gen-naacl)
     
     (gen-bib-and-write "AISTATS" 2019 gen-aistats)
     (gen-bib-and-write "CVPR" 2019 gen-cvpr))
