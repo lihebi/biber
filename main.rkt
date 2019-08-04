@@ -5,7 +5,7 @@
          sxml
          html-parsing
          rackunit
-         "newutils.rkt"
+         "utils.rkt"
          "bibgen.rkt")
 
 ;; tests
