@@ -14,6 +14,10 @@
   (parameterize ([BIBDIR "/home/hebi/github/biber-dist/"])
     (gen-bib-and-write "ICML" 2019 gen-icml)
     (gen-bib-and-write "ICFP" 2019 gen-icfp)
+
+    (for ([year (in-range 2015 2020)])
+      (gen-bib-and-write "ISCA" year gen-isca))
+    
     
     (for ([cat (list "cs.AI" "cs.CV" "cs.LG"
                      ;; "cs.PL" "cs.RO"

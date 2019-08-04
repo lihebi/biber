@@ -5,6 +5,7 @@
          sxml
          html-parsing
          rackunit
+         roman-numeral
          "utils.rkt")
 
 (provide gen-icml
@@ -12,6 +13,7 @@
          gen-cvpr
          gen-naacl
          gen-icfp
+         gen-isca
          arxiv-bib)
 
 
@@ -120,8 +122,13 @@
 (define (xexp-get-all-text x)
     (match x
       [(list '@ child ...) ""]
+      ;; (& mdash)
+      [(list '& child ...) ""]
+      ;; this must be the last list pattern
       [(list name child ...) (string-join (map xexp-get-all-text child) "")]
-      [s s]))
+      [s #:when (string? s) s]
+      ;; fallback, probably the default error message is better
+      [a (error "No matching")]))
 
 (define (acl-bib conf year)
   (define acl-prefix "https://aclanthology.info/events/")
@@ -177,12 +184,13 @@ in new partition"
 
 
   (define papers (for/list ([x paper-xexps])
-                   (let ([title (first ((sxpath "//a/text()") (first x)))]
-                         [author (map string-trim
-                                      (string-split
-                                       (string-join
-                                        ((sxpath "//text()") (second x)))
-                                       ","))]
+                   (let ([title (xexp-get-all-text (first ((sxpath "//a") (first x))))]
+                         [author (filter non-empty-string?
+                                         (map string-trim
+                                              (string-split
+                                               (string-join
+                                                ((sxpath "//text()") (second x)))
+                                               ",")))]
                          [pdflink (~a "https://dl.acm.org/"
                                       (first
                                        (string-split
@@ -198,13 +206,90 @@ in new partition"
   (case year
     [(2019) (acm-bib 3352468 "ICFP" 2019)]))
 
+(define (get-year str)
+  (let ([year (let ([m (regexp-match #rx"[0-9]+" str)])
+                (if m
+                    (string->number (first m))
+                    ;; asplos
+                    (if (string-prefix? str "ASPLOS")
+                        (list-ref '(82 87 89 91 92 94 96 98 00 02 04 06 08 09 10 11 12)
+                                  (sub1 (roman->number (second (string-split str)))))
+                        (raise-syntax-error #f (~a "Year not valid: " str)))))])
+    (cond
+      [(< year 30) (+ year 2000)]
+      [(< year 100) (+ year 1900)]
+      [else year])))
+
+(module+ test
+  (get-year "ICSE '08")
+  ;; FIXME ??
+  (get-year "ASPLOS IX"))
+
+
+(define (acm-conf-get-proceedings-impl conf
+                                       #:skip [skip '()])
+  "Return the ID for the specific year of the conf."
+  "Return ((year id) ...)"
+  ;; FIXME what to do if year appears multiple times
+  (define acm-index-url "https://dl.acm.org/proceedings.cfm")
+  (define xexp (port->xexp (open-url-port acm-index-url)))
+
+  ;; get a list of <strong> for each conference
+  ;; get a list of ul AFTER <strong> for year list
+  ;; pair them up
+
+  ;; 2499
+  (define confs (map xexp-get-all-text
+                     ((sxpath "//div[@class='text12']/strong") xexp)))
+  (define details ((sxpath "//div[@class='text12']/ul") xexp))
+
+  (when (not (= (length confs)
+                (length details)))
+    (error "Number does not match"))
+
+  (let ([idx (index-of confs conf)])
+    (when idx
+      (let ([detail (list-ref details idx)])
+        (define ids (map (λ (s) (string->number (first (regexp-match #rx"[0-9]+" s))))
+                         ((sxpath "//li/a/@href/text()") detail)))
+        (define years (map get-year ((sxpath "//li/a/@title/text()") detail)))
+        (when (not (= (length ids)
+                      (length years)))
+          (error "Number does not match"))
+        (let ([res (for/list ([id ids]
+                              [year years]
+                              #:when (not (member id skip)))
+                     (list year id))])
+          ;; check for duplication
+          ;; TODO this post-condition should be implemented as a function contract?
+          (let ([dup (check-duplicates (map first res))])
+            (when dup
+              (error (format "Error: duplicate: ~a" dup))))
+          res)))))
+
+(define (acm-conf-get-proceedings conf)
+  (case conf
+    [(isca) (acm-conf-get-proceedings-impl "International Symposium on Computer Architecture"
+                                           #:skip '(2185870 285930))]))
+
+
+(define (acm-lookup-id conf year)
+  (let ([res (assoc year (acm-conf-get-proceedings conf))])
+    (when (not res)
+      (error (format "No ~a ~a" conf year)))
+    (second res)))
+
+(define (gen-isca year)
+  (let ([id (acm-lookup-id 'isca year)])
+    (acm-bib id "ISCA" year)))
+
 
 (module+ test
   (void (arxiv-bib "cs.AI" 2017 1))
 
   (void (acm-bib 3352468 "ICFP" 2019))
+  (void (gen-isca 2015))
 
-  #;
-  (with-output-to-file "tmp.txt"
-    (λ () (displayln xexp)))
-  )
+  (acm-lookup-id 'isca 2015)
+
+  (void (acm-bib 2749469 "ISCA" 2015)))
