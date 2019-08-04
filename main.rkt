@@ -141,11 +141,63 @@
   (case year
     [(2019) (acl-bib "NAACL" 2019)]))
 
+(define (acm-confid->url id)
+  (string-append "https://dl.acm.org/citation.cfm?id="
+                 (number->string id) "&preflayout=flat"))
+
+(define (partition-by proc lst)
+  "If proc return #t, start a new partition. This particular item is
+in new partition"
+  (foldl (λ (x acc)
+           (if (proc x)
+               (append acc (list (list x)))
+               (if (empty? acc) acc
+                   (append (drop-right acc 1)
+                           (list (append (last acc) (list x)))))))
+         '() lst))
+
+(define (acm-bib id conf year)
+  ;; (define conf "ICFP")
+  ;; (define year 2019)
+  ;; (define id 3352468)
+  (define xexp (port->xexp (open-url-port (acm-confid->url id))))
+
+  (define paper-xexps (partition-by
+                       (λ (x)
+                         (not (empty?
+                               ((sxpath "//a[contains(@href, 'citation.cfm')]/@href") x))))
+                       ((sxpath "//tr/td/span") xexp)))
+
+
+  (define papers (for/list ([x paper-xexps])
+                   (let ([title (first ((sxpath "//a/text()") (first x)))]
+                         [author (map string-trim
+                                      (string-split
+                                       (string-join
+                                        ((sxpath "//text()") (second x)))
+                                       ","))]
+                         [pdflink (~a "https://dl.acm.org/"
+                                      (first
+                                       (string-split
+                                        (first
+                                         ((sxpath "//a[contains(@href, 'ft_gateway.cfm')]/@href/text()")
+                                          x))
+                                        "dwn=1"))
+                                      "dwn=1")])
+                     (paper title author pdflink conf year))))
+  (string-join (map gen-single-bib papers) "\n"))
+
+(define (gen-icfp year)
+  (case year
+    [(2019) (acm-bib 3352468 "ICFP" 2019)]))
+
 
 ;; tests
 (module+ test
 
   (void (arxiv-bib "cs.AI" 2017 1))
+
+  (void (acm-bib 3352468 "ICFP" 2019))
 
   #;
   (with-output-to-file "tmp.txt"
@@ -153,6 +205,7 @@
 
   (parameterize ([BIBDIR "/home/hebi/github/biber-dist/"])
     (gen-bib-and-write "ICML" 2019 gen-icml)
+    (gen-bib-and-write "ICFP" 2019 gen-icfp)
     
     (for ([cat (list "cs.AI" "cs.CV" "cs.LG"
                      ;; "cs.PL" "cs.RO"

@@ -23,6 +23,8 @@ pip3 install --user beautifulsoup4 lxml
 - [ ] IJCAI 19: August 10-16 https://www.ijcai19.org/accepted-papers.html
 - [X] CVPR 19: http://openaccess.thecvf.com/CVPR2019.py
 - [X] arXiv
+- [ ] AAAI 19
+- [X] ICFP 19
 
 ** support major CS conferences
 

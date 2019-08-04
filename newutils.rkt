@@ -66,7 +66,9 @@
 (check-equal? (clean-string " Hello  World  ") "Hello World")
 
 (struct paper
-  (title authors pdflink booktitle year))
+  ;; TODO add contract
+  (title authors pdflink booktitle year)
+  #:prefab)
 
 (define (title-first-word title)
   (define stop-words '("you" "the" "and" "can"
