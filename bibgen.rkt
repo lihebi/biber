@@ -14,6 +14,8 @@
          gen-naacl
          gen-icfp
          gen-isca
+         gen-iccad
+         gen-dac
          arxiv-bib)
 
 
@@ -191,14 +193,17 @@ in new partition"
                                                (string-join
                                                 ((sxpath "//text()") (second x)))
                                                ",")))]
-                         [pdflink (~a "https://dl.acm.org/"
-                                      (first
-                                       (string-split
-                                        (first
-                                         ((sxpath "//a[contains(@href, 'ft_gateway.cfm')]/@href/text()")
-                                          x))
-                                        "dwn=1"))
-                                      "dwn=1")])
+                         [pdflink (let ([a ((sxpath
+                                             "//a[contains(@href, 'ft_gateway.cfm')]/@href/text()")
+                                            x)])
+                                    (if (empty? a) #f
+                                        (~a "https://dl.acm.org/"
+                                            (first
+                                             (string-split
+                                              (first
+                                               a)
+                                              "dwn=1"))
+                                            "dwn=1"))) ])
                      (paper title author pdflink conf year))))
   (string-join (map gen-single-bib papers) "\n"))
 
@@ -270,7 +275,9 @@ in new partition"
 (define (acm-conf-get-proceedings conf)
   (case conf
     [(isca) (acm-conf-get-proceedings-impl "International Symposium on Computer Architecture"
-                                           #:skip '(2185870 285930))]))
+                                           #:skip '(2185870 285930))]
+    [(iccad) (acm-conf-get-proceedings-impl "International Conference on Computer-Aided Design")]
+    [(dac) (acm-conf-get-proceedings-impl "Design Automation Conference")]))
 
 
 (define (acm-lookup-id conf year)
@@ -283,13 +290,26 @@ in new partition"
   (let ([id (acm-lookup-id 'isca year)])
     (acm-bib id "ISCA" year)))
 
+(define (gen-iccad year)
+  (let ([id (acm-lookup-id 'iccad year)])
+    (acm-bib id "ICCAD" year)))
+
+(define (gen-dac year)
+  (let ([id (acm-lookup-id 'dac year)])
+    (acm-bib id "DAC" year)))
+
+
+
 
 (module+ test
-  (void (arxiv-bib "cs.AI" 2017 1))
+  ;; (void (arxiv-bib "cs.AI" 2017 1))
 
-  (void (acm-bib 3352468 "ICFP" 2019))
-  (void (gen-isca 2015))
+  ;; (void (acm-bib 3352468 "ICFP" 2019))
+  ;; (void (gen-isca 2015))
 
-  (acm-lookup-id 'isca 2015)
+  ;; (acm-lookup-id 'isca 2015)
+  
+  (void (acm-bib (acm-lookup-id 'iccad 2015) "Test" 2015))
 
-  (void (acm-bib 2749469 "ISCA" 2015)))
+  ;; (void (acm-bib 2749469 "ISCA" 2015))
+  )

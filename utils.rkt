@@ -106,12 +106,13 @@
                            "-")))
   (define author (string-join (paper-authors p) ", "))
   (define year (paper-year p))
-  (string-append "@inproceedings{" id ",\n"
-                 "  title={" (clean-string (paper-title p)) "},\n"
-                 "  author={" (clean-string author) "},\n"
-                 "  year={" (number->string (paper-year p)) "},\n"
-                 "  booktitle={" (paper-booktitle p) "},\n"
-                 "  pdflink={" (paper-pdflink p) "}\n}\n"))
+  (~a "@inproceedings{" id ",\n"
+      "  title={" (clean-string (paper-title p)) "},\n"
+      "  author={" (clean-string author) "},\n"
+      "  year={" (number->string (paper-year p)) "},\n"
+      "  booktitle={" (paper-booktitle p) "},\n"
+      ;; FIXME if pdflink is #f, this should just output #f
+      "  pdflink={" (paper-pdflink p) "}\n}\n"))
 
 (define BIBDIR (make-parameter "bib"))
 

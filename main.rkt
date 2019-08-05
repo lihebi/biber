@@ -17,6 +17,10 @@
 
     (for ([year (in-range 2015 2020)])
       (gen-bib-and-write "ISCA" year gen-isca))
+    (for ([year (in-range 2015 2019)])
+      (gen-bib-and-write "ICCAD" year gen-iccad))
+    (for ([year (in-range 2015 2020)])
+      (gen-bib-and-write "DAC" year gen-dac))
     
     
     (for ([cat (list "cs.AI" "cs.CV" "cs.LG"

@@ -39,8 +39,8 @@ AI conferences
 - [ ] neurocomputing https://www.sciencedirect.com/journal/neurocomputing
 - [ ] HotOS
 - [X] ISCA https://dl.acm.org/event.cfm?id=RE239
-- [ ] DAC (Design Automation Conference)
-  - [ ] ICCAD (International Conference On Computer Aided Design)
+- [X] DAC (Design Automation Conference)
+- [X] ICCAD (International Conference On Computer Aided Design)
 - [ ] Journal of Functional Programming
 
 
