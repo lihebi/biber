@@ -42,6 +42,7 @@ AI conferences
 - [X] DAC (Design Automation Conference)
 - [X] ICCAD (International Conference On Computer Aided Design)
 - [ ] Journal of Functional Programming
+- [ ] TOPLAS
 
 
 

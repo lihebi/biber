@@ -8,15 +8,9 @@
          roman-numeral
          "utils.rkt")
 
-(provide gen-icml
-         gen-aistats
-         gen-cvpr
-         gen-naacl
-         gen-icfp
-         gen-isca
-         gen-iccad
-         gen-dac
-         arxiv-bib)
+(provide
+ gen-bib
+ arxiv-bib)
 
 
 (define (pmlr-bib volume booktitle year)
@@ -202,10 +196,6 @@ in new partition"
                      (paper title author pdflink conf year))))
   (string-join (map gen-single-bib papers) "\n"))
 
-(define (gen-icfp year)
-  (case year
-    [(2019) (acm-bib 3352468 "ICFP" 2019)]))
-
 (define (get-year str)
   (let ([year (let ([m (regexp-match #rx"[0-9]+" str)])
                 (if m
@@ -219,6 +209,7 @@ in new partition"
       [(< year 30) (+ year 2000)]
       [(< year 100) (+ year 1900)]
       [else year])))
+
 
 (module+ test
   (get-year "ICSE '08")
@@ -272,7 +263,8 @@ in new partition"
     [(isca) (acm-conf-get-proceedings-impl "International Symposium on Computer Architecture"
                                            #:skip '(2185870 285930))]
     [(iccad) (acm-conf-get-proceedings-impl "International Conference on Computer-Aided Design")]
-    [(dac) (acm-conf-get-proceedings-impl "Design Automation Conference")]))
+    [(dac) (acm-conf-get-proceedings-impl "Design Automation Conference")]
+    [(pldi) (acm-conf-get-proceedings-impl "Programming Language Design and Implementation")]))
 
 
 (define (acm-lookup-id conf year)
@@ -281,19 +273,28 @@ in new partition"
       (error (format "No ~a ~a" conf year)))
     (second res)))
 
-(define (gen-isca year)
-  (let ([id (acm-lookup-id 'isca year)])
-    (acm-bib id "ISCA" year)))
+(define (gen-icfp year)
+  (case year
+    [(2019) (acm-bib 3352468 "ICFP" 2019)]))
 
-(define (gen-iccad year)
-  (let ([id (acm-lookup-id 'iccad year)])
-    (acm-bib id "ICCAD" year)))
+(define (gen-popl year)
+  "2018-19 POPL is not listed in acm proceeding page"
+  (case year
+    [(2018) (acm-bib 3177123 "POPL" 2018)]
+    [(2019) (acm-bib 3302515 "POPL" 2019)]))
 
-(define (gen-dac year)
-  (let ([id (acm-lookup-id 'dac year)])
-    (acm-bib id "DAC" year)))
-
-
+(define (gen-bib conf year)
+  (case conf
+    [(pldi dac iccad isca)
+     (let ([id (acm-lookup-id conf year)])
+       (acm-bib id (string-upcase (symbol->string conf)) year))]
+    [(popl) (gen-popl year)]
+    [(icml) (gen-icml year)]
+    [(aistats) (gen-aistats year)]
+    [(cvpr) (gen-cvpr year)]
+    [(naacl) (gen-naacl year)]
+    [(icfp) (gen-icfp year)]
+    ))
 
 
 (module+ test

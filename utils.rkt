@@ -9,10 +9,7 @@
 (provide port->xexp
          open-url-port
          gen-single-bib
-         paper
-         gen-bib-and-write
-         gen-bib-and-write-arxiv
-         BIBDIR)
+         paper)
 
 
 (define (port->xexp in)
@@ -114,35 +111,3 @@
       ;; FIXME if pdflink is #f, this should just output #f
       "  pdflink={" (paper-pdflink p) "}\n}\n"))
 
-(define BIBDIR (make-parameter "bib"))
-
-(define (gen-bib-and-write conf year bibfunc #:overwrite [overwrite #f])
-  (define bibdir (string-append (BIBDIR) "/" conf))
-  (when (not (file-exists? bibdir))
-    (make-directory* bibdir))
-  (let ([f (string-append bibdir "/" conf "-" (number->string year) ".bib")])
-    (when (or (not (file-exists? f))
-              overwrite)
-      (displayln "Generating bib ..")
-      (let ([output (bibfunc year)])
-        (displayln (format "Writing to ~a ..." f))
-        (with-output-to-file f
-          (λ () (displayln output))
-          #:exists 'replace)))))
-
-(define (gen-bib-and-write-arxiv cat year month bibfunc #:overwrite [overwrite #f])
-  (define bibdir (string-append (BIBDIR) "/" cat))
-  (when (not (file-exists? bibdir))
-    (make-directory* bibdir))
-  (let ([f (string-append bibdir "/" cat "-" (number->string year) "-"
-                          (~a month
-                              #:width 2 #:pad-string "0" #:align 'right)
-                          ".bib")])
-    (when (or (not (file-exists? f))
-              overwrite)
-      (displayln "Generating bib ..")
-      (let ([output (bibfunc cat year month)])
-        (displayln (format "Writing to ~a ..." f))
-        (with-output-to-file f
-          (λ () (displayln output))
-          #:exists 'replace)))))
