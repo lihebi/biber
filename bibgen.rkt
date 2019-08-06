@@ -187,12 +187,7 @@ in new partition"
 
   (define papers (for/list ([x paper-xexps])
                    (let ([title (xexp-get-all-text (first ((sxpath "//a") (first x))))]
-                         [author (filter non-empty-string?
-                                         (map string-trim
-                                              (string-split
-                                               (string-join
-                                                ((sxpath "//text()") (second x)))
-                                               ",")))]
+                         [author ((sxpath "//a/text()") (second x))]
                          [pdflink (let ([a ((sxpath
                                              "//a[contains(@href, 'ft_gateway.cfm')]/@href/text()")
                                             x)])
