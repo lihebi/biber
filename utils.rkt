@@ -89,7 +89,7 @@
 
 
 (define (clean-id id)
-  (string-replace id #rx"’|\\+" ""))
+  (string-replace id #rx"’|\\+|\\." ""))
 
 (module+ test
   (clean-id "’hello+"))
