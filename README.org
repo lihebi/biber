@@ -22,6 +22,9 @@ the APIs, e.g.
 See main.rkt for more examples. I haven't tested using it as a package
 though, so there might be some minor problems accessing the APIs.
 
+You can also directly get the bib output from
+[[https://github.com/lihebi/biber-dist][lihebi/biber-dist]]
+
 
 * Features
 
