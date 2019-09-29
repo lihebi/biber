@@ -2,14 +2,17 @@
 
 (require file/sha1
          net/url
+         json
          sxml
          html-parsing
          rackunit)
 
-(provide port->xexp
-         open-url-port
-         gen-single-bib
-         paper)
+(provide
+ url->xexp
+ file->xexp
+ url->json
+ gen-single-bib
+ paper)
 
 
 (define (port->xexp in)
@@ -56,6 +59,24 @@
         (close-input-port in)
         (close-output-port out)))
     (open-input-file out-fname)))
+
+(define (url->xexp url)
+  "Download url to /tmp/xxx and parse it to xexp.
+
+This function uses open-url-port, and close port automatically."
+  (let ([port (open-url-port url)])
+    (begin0 (port->xexp port)
+      (close-input-port port))))
+
+(define (url->json url)
+  (let ([port (open-url-port url)])
+    (begin0 (read-json port)
+      (close-input-port port))))
+
+(define (file->xexp path)
+  (call-with-input-file
+    (λ (port)
+      (port->xexp port))))
 
 
 (define (clean-string s)

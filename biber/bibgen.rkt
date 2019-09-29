@@ -5,6 +5,7 @@
          sxml
          html-parsing
          rackunit
+         json
          roman-numeral
          "utils.rkt")
 
@@ -16,8 +17,7 @@
 (define (pmlr-bib volume booktitle year)
   ;; PMLR http://proceedings.mlr.press/
   (define pmlr-prefix "http://proceedings.mlr.press/")
-  (define xexp (port->xexp (open-url-port
-                            (string-append pmlr-prefix "v" (number->string volume)))))
+  (define xexp (url->xexp (string-append pmlr-prefix "v" (number->string volume))))
   (string-join
    (for/list ([p ((sxpath "//div[@class='paper']") xexp)])
      (define title (first ((sxpath "//p[@class='title']/text()") p)))
@@ -40,8 +40,7 @@
   ;; http://openaccess.thecvf.com/CVPR2019.py
   (define thecvf-prefix "http://openaccess.thecvf.com/")
   (define suffix "CVPR2019.py")
-  (define xexp (port->xexp (open-url-port
-                            (string-append thecvf-prefix suffix))))
+  (define xexp (url->xexp (string-append thecvf-prefix suffix)))
 
   (define titles ((sxpath "//dt/a/text()") xexp))
   (define dts ((sxpath "//dd") xexp))
@@ -66,6 +65,51 @@
   (case year
     [(2019) (thecvf-bib "CVPR2019.py" "CVPR" 2019)]))
 
+(define (open-review-bib-2020)
+  ;; 2020 is on review phase, only one tag is avaiable.
+  ;; I'm going to crawl 4 different kinds of bibs:
+  ;;
+  ;; - submitted: this is used during review session, and should be
+  ;;   removed after that.
+  ;; - accepted, oral
+  ;; - accepted, poster
+  ;; - rejected
+
+  ;; https://openreview.net/group?id=ICLR.cc/2020/Conference
+  ;; https://openreview.net/group?id=ICLR.cc/2019/Conference
+  ;; this seems to give only 1000
+  ;; the total number of papers are 2587
+  ;; (define iclr-2020-json-url "https://openreview.net/notes?invitation=ICLR.cc%2F2020%2FConference%2F-%2FBlind_Submission&details=replyCount%2Coriginal")
+  (define iclr-2020-json-url "https://openreview.net/notes?invitation=ICLR.cc/2020/Conference/-/Blind_Submission")
+  ;; total count
+  (define count (hash-ref
+                 (url->json
+                  (string-append iclr-2020-json-url "&offset=0&limit=500"))
+                 'count))
+
+  (define iclr-2020-urls (for/list ([i (in-range (ceiling (/ count 500)))])
+                           (string-append iclr-2020-json-url
+                                          (format "&offset=~a&limit=500" (* i 500)))))
+  (define (json->paper j)
+    (let* ([number (hash-ref j 'number)]
+           [content (hash-ref j 'content)]
+           [pdf (hash-ref content 'pdf)]
+           [title (hash-ref content 'title)]
+           [keywords (hash-ref content 'keywords)])
+      (list number pdf title keywords)
+      (paper title (list (~a "Author" number)) pdf "ICLRSubmit" 2020)))
+  (define papers (apply append (for/list ([url iclr-2020-urls])
+                                 (for/list ([p (hash-ref (url->json url) 'notes)])
+                                   (json->paper p)))))
+  (when (= count (length papers))
+    (error "Not match count ~a but parsed papers ~a" count (length paper)))
+  ;; (gen-single-bib (json->paper (first (hash-ref j 'notes))))
+  (string-join (map gen-single-bib papers) "\n"))
+
+(define (gen-iclr year)
+  (case year
+    [(2020) (open-review-bib-2020)]))
+
 ;; https://arxiv.org/list/cs.AI/1905
 ;; https://arxiv.org/list/cs.AI/1905?show=99999
 
@@ -83,7 +127,7 @@
          #:width 2 #:pad-string "0" #:align 'right)
      (~a month
          #:width 2 #:pad-string "0" #:align 'right)))
-  
+
   (check-equal? (arxiv-query-date 2019 7) "1907")
   (check-equal? (arxiv-query-date 1995 11) "9511")
   (check-equal? (arxiv-query-date 2000 2) "0002")
@@ -91,7 +135,7 @@
   (define url (format "https://arxiv.org/list/~a/~a?show=999999"
                       cat (arxiv-query-date year month)))
   (println url)
-  (define xexp (port->xexp (open-url-port url)))
+  (define xexp (url->xexp url))
   (define IDs (map (λ (s)
                      (last (string-split s "/")))
                    ((sxpath "//dt/span/a[2]/@href/text()") xexp)))
@@ -130,7 +174,7 @@
   (define acl-prefix "https://aclanthology.info/events/")
   (define suffix (string-append (string-downcase conf) "-" (number->string year)))
   (define url (string-append acl-prefix suffix))
-  (define xexp (port->xexp (open-url-port url)))
+  (define xexp (url->xexp url))
 
   (define paper-xexps ((sxpath "//div[@id='n19-1']/p") xexp))
 
@@ -170,7 +214,7 @@ in new partition"
   ;; (define conf "ICFP")
   ;; (define year 2019)
   ;; (define id 3352468)
-  (define xexp (port->xexp (open-url-port (acm-confid->url id))))
+  (define xexp (url->xexp (acm-confid->url id)))
 
   (define paper-xexps (partition-by
                        (λ (x)
@@ -223,7 +267,7 @@ in new partition"
   "Return ((year id) ...)"
   ;; FIXME what to do if year appears multiple times
   (define acm-index-url "https://dl.acm.org/proceedings.cfm")
-  (define xexp (port->xexp (open-url-port acm-index-url)))
+  (define xexp (url->xexp acm-index-url))
 
   ;; get a list of <strong> for each conference
   ;; get a list of ul AFTER <strong> for year list
@@ -297,6 +341,7 @@ in new partition"
     [(cvpr) (gen-cvpr year)]
     [(naacl) (gen-naacl year)]
     [(icfp) (gen-icfp year)]
+    [(iclr) (gen-iclr year)]
     ))
 
 
@@ -307,7 +352,7 @@ in new partition"
   ;; (void (gen-isca 2015))
 
   ;; (acm-lookup-id 'isca 2015)
-  
+
   (void (acm-bib (acm-lookup-id 'iccad 2015) "Test" 2015))
 
   ;; (void (acm-bib 2749469 "ISCA" 2015))

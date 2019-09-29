@@ -14,6 +14,7 @@
     
     (gen-bib-and-write 'aistats 2019)
     (gen-bib-and-write 'cvpr 2019)
+    (gen-bib-and-write 'iclr 2020)
 
     ;; system
     (for ([year (in-range 2015 2020)])
