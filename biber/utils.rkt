@@ -43,8 +43,9 @@
   ;; (bytes->hex-string (string->bytes/locale "feis"))
   ;;
   ;; return an input port for reading
-  (let ([out-fname (string-append "tmp/" (string-hash url))])
+  (let ([out-fname (string-append "/tmp/biber/" (string-hash url))])
     (when (not (file-exists? out-fname))
+      (make-parent-directory* out-fname)
       (let ([in (get-pure-port
                  (string->url url)
                  #:redirections 5)]
