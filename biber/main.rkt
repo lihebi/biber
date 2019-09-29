@@ -1,52 +1,12 @@
 #lang racket
 
-(require file/sha1
-         net/url
-         sxml
-         html-parsing
-         rackunit
-         "utils.rkt"
-         "bibgen.rkt")
-
-
-(define BIBDIR (make-parameter "bib"))
-
-(define (gen-bib-and-write conf year #:overwrite [overwrite #f])
-  (define conf-str (string-upcase (symbol->string conf)))
-  (define bibdir (string-append (BIBDIR) "/" conf-str))
-  (when (not (file-exists? bibdir))
-    (make-directory* bibdir))
-  (let ([f (string-append bibdir "/" conf-str "-" (number->string year) ".bib")])
-    (when (or (not (file-exists? f))
-              overwrite)
-      (displayln (format "Generating bib for ~a ~a .." conf year))
-      (let ([output (gen-bib conf year)])
-        (displayln (format "Writing to ~a ..." f))
-        (with-output-to-file f
-          (λ () (displayln output))
-          #:exists 'replace)))))
-
-(define (gen-bib-and-write-arxiv cat year month bibfunc #:overwrite [overwrite #f])
-  (define bibdir (string-append (BIBDIR) "/" cat))
-  (when (not (file-exists? bibdir))
-    (make-directory* bibdir))
-  (let ([f (string-append bibdir "/" cat "-" (number->string year) "-"
-                          (~a month
-                              #:width 2 #:pad-string "0" #:align 'right)
-                          ".bib")])
-    (when (or (not (file-exists? f))
-              overwrite)
-      (displayln "Generating bib ..")
-      (let ([output (bibfunc cat year month)])
-        (displayln (format "Writing to ~a ..." f))
-        (with-output-to-file f
-          (λ () (displayln output))
-          #:exists 'replace)))))
+(require "bibgen.rkt"
+         "bib-write.rkt")
 
 ;; tests
 (module+ test
 
-  (parameterize ([BIBDIR "/home/hebi/github/biber-dist/"])
+  (parameterize ([BIBDIR "~/git/biber-dist/"])
 
     ;; AI
     (gen-bib-and-write 'icml 2019)
