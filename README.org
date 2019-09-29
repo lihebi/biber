@@ -2,17 +2,25 @@
 
 * Install
 
-Racket packages:
+You can install it as a racket package:
 
 #+BEGIN_EXAMPLE
-raco pkg install html-parsing sxml roman-numeral sha
+raco pkg install https://github.com/lihebi/biber
 #+END_EXAMPLE
 
-Python packages:
+But currently I didn't expose cmd interface. So you will need to use
+the APIs, e.g.
 
-#+BEGIN_EXAMPLE
-pip3 install --user beautifulsoup4 lxml
-#+END_EXAMPLE
+#+BEGIN_SRC racket
+(require biber/bibgen
+         biber/bib-write)
+(parameterize ([BIBDIR "~/git/biber-dist/"])
+    (gen-bib-and-write 'icml 2019)
+    (gen-bib-and-write 'naacl 2019))
+#+END_SRC
+
+See main.rkt for more examples. I haven't tested using it as a package
+though, so there might be some minor problems accessing the APIs.
 
 
 * Features
