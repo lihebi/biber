@@ -274,14 +274,17 @@ in new partition"
     (second res)))
 
 (define (gen-icfp year)
+  "17-19"
   (case year
-    [(2019) (acm-bib 3352468 "ICFP" 2019)]))
+    [(2019) (acm-bib 3352468 "ICFP" year)]
+    [(2018) (acm-bib 3243631 "ICFP" year)]
+    [(2017) (acm-bib 3136534 "ICFP" year)]))
 
 (define (gen-popl year)
   "2018-19 POPL is not listed in acm proceeding page"
   (case year
-    [(2018) (acm-bib 3177123 "POPL" 2018)]
-    [(2019) (acm-bib 3302515 "POPL" 2019)]))
+    [(2018) (acm-bib 3177123 "POPL" year)]
+    [(2019) (acm-bib 3302515 "POPL" year)]))
 
 (define (gen-bib conf year)
   (case conf

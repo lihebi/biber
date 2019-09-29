@@ -68,6 +68,7 @@
     (gen-bib-and-write 'popl 2019)
     (gen-bib-and-write 'pldi 2019)
     (gen-bib-and-write 'icfp 2019)
+    (gen-bib-and-write 'icfp 2018)
 
 
     ;; arxiv
