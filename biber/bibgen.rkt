@@ -97,7 +97,11 @@
            [title (hash-ref content 'title)]
            [keywords (hash-ref content 'keywords)])
       (list number pdf title keywords)
-      (paper title (list (~a "Author" number)) pdf "ICLRSubmit" 2020)))
+      (paper title
+             (list (~a "Author" number))
+             (string-append "https://openreview.net" pdf)
+             "ICLRSubmit"
+             2020)))
   (define papers (apply append (for/list ([url iclr-2020-urls])
                                  (for/list ([p (hash-ref (url->json url) 'notes)])
                                    (json->paper p)))))
