@@ -19,7 +19,7 @@
   (let ([f (string-append bibdir "/" conf-str "-" (number->string year) ".bib")])
     (when (or (not (file-exists? f))
               overwrite)
-      (displayln (format "Generating bib for {} {} .." conf year))
+      (displayln (format "Generating bib for ~a ~a .." conf year))
       (let ([output (gen-bib conf year)])
         (displayln (format "Writing to ~a ..." f))
         (with-output-to-file f
