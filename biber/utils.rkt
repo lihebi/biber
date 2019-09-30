@@ -108,7 +108,8 @@ This function uses open-url-port, and close port automatically."
 
 
 (define (clean-id id)
-  (string-replace id #rx"’|\\+|\\." ""))
+  ;; There maybe * in author name
+  (string-replace id #rx"’|\\+|\\.|\\*" ""))
 
 (module+ test
   (clean-id "’hello+"))
@@ -126,6 +127,8 @@ This function uses open-url-port, and close port automatically."
   (define author (string-join (paper-authors p) ", "))
   (define year (paper-year p))
   (~a "@inproceedings{" id ",\n"
+      ;; TODO sometimes the title is all upper case (such as some in
+      ;; ICLR). I probably want to clean this up.
       "  title={" (clean-string (paper-title p)) "},\n"
       "  author={" (clean-string author) "},\n"
       "  year={" (number->string (paper-year p)) "},\n"
