@@ -65,54 +65,95 @@
   (case year
     [(2019) (thecvf-bib "CVPR2019.py" "CVPR" 2019)]))
 
-(define (open-review-bib-2020)
-  ;; 2020 is on review phase, only one tag is avaiable.
-  ;; I'm going to crawl 4 different kinds of bibs:
-  ;;
-  ;; - submitted: this is used during review session, and should be
-  ;;   removed after that.
-  ;; - accepted, oral
-  ;; - accepted, poster
-  ;; - rejected
-
-  ;; https://openreview.net/group?id=ICLR.cc/2020/Conference
-  ;; https://openreview.net/group?id=ICLR.cc/2019/Conference
-  ;; this seems to give only 1000
-  ;; the total number of papers are 2587
-  ;; (define iclr-2020-json-url "https://openreview.net/notes?invitation=ICLR.cc%2F2020%2FConference%2F-%2FBlind_Submission&details=replyCount%2Coriginal")
-  (define iclr-2020-json-url "https://openreview.net/notes?invitation=ICLR.cc/2020/Conference/-/Blind_Submission")
-  ;; total count
-  (define count (hash-ref
-                 (url->json
-                  (string-append iclr-2020-json-url "&offset=0&limit=500"))
-                 'count))
-
-  (define iclr-2020-urls (for/list ([i (in-range (ceiling (/ count 500)))])
-                           (string-append iclr-2020-json-url
-                                          (format "&offset=~a&limit=500" (* i 500)))))
-  (define (json->paper j)
-    (let* ([number (hash-ref j 'number)]
-           [content (hash-ref j 'content)]
+(define (open-review-p->paper p decision year)
+    (let* ([number (hash-ref p 'number)]
+           [content (hash-ref p 'content)]
            [pdf (hash-ref content 'pdf)]
+           ;; ("Sirisha Rambhatla" "Xingguo Li" "Jarvis Haupt")
+           [authors (hash-ref content 'authors)]
            [title (hash-ref content 'title)]
            [keywords (hash-ref content 'keywords)])
-      (list number pdf title keywords)
       (paper title
-             (list (~a "Author" number))
+             (case decision
+               [(#f) (list (~a "Author" number))]
+               [else authors])
              (string-append "https://openreview.net" pdf)
-             "ICLRSubmit"
-             2020)))
-  (define papers (apply append (for/list ([url iclr-2020-urls])
-                                 (for/list ([p (hash-ref (url->json url) 'notes)])
-                                   (json->paper p)))))
-  (when (= count (length papers))
-    (error "Not match count ~a but parsed papers ~a" count (length paper)))
-  ;; (gen-single-bib (json->paper (first (hash-ref j 'notes))))
+             (case decision
+               [(oral) "ICLROral"]
+               [(poster) "ICLRPoster"]
+               [(reject) "ICLRReject"]
+               [(#f) "ICLRSubmit"]
+               [else (error "Decision not recognized: " decision)])
+             year)))
+
+(define (open-review-json->papers submit-jobj review-jobj year)
+  "Parse the json object, and return a list of struct paper.
+
+jobj is the submitted paper database. jobj-decision is optional decision database."
+  (case review-jobj
+    [(#f) (for/list ([p submit-jobj])
+            (open-review-p->paper p #f year))]
+    [else
+     ;; Steps:
+     ;; 1. create hash table for jobj
+     (define submit-db (for/hash ([p submit-jobj])
+                         (values (hash-ref p 'forum) p)))
+     ;; 2. go through different decisions, and generate paper
+     (define (get-decision p)
+       (let ([dec (hash-ref (hash-ref p 'content) 'recommendation)])
+         (case dec
+           [("Reject") 'reject]
+           [("Accept (Poster)") 'poster]
+           [("Accept (Oral)") 'oral]
+           [else (error "Decision not recognized:" dec)])))
+     (apply append
+            ;; three decisions
+            (for/list ([decision '(oral poster reject)])
+              (let* ([reviews (filter (λ (p) (eq? (get-decision p) decision)) review-jobj)]
+                     [papers (for/list ([r reviews])
+                               ;; 3. the forum field is what connects the review and paper
+                               (hash-ref submit-db (hash-ref r 'forum)))])
+                (for/list ([p papers])
+                  (open-review-p->paper p decision year)))))]))
+
+(define (open-review-url->json url)
+  (define count (hash-ref
+                 (url->json
+                  (string-append url "&offset=0&limit=500"))
+                 'count))
+  (define urls (for/list ([i (in-range (ceiling (/ count 500)))])
+                 (string-append url
+                                (format "&offset=~a&limit=500" (* i 500)))))
+  (apply append (for/list ([url urls])
+                  (hash-ref (url->json url) 'notes))))
+
+(define (open-review-bib year)
+  ;; (define year 2019)
+  (define submit-url (case year
+                       [(2019) "https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Blind_Submission"]
+                       [(2020) "https://openreview.net/notes?invitation=ICLR.cc/2020/Conference/-/Blind_Submission"]
+                       [else (error "Open review does not support year:" year)]))
+  (define review-url (case year
+                       [(2019) "https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Paper.*/Meta_Review"]
+                       [(2020) #f]))
+
+  (define submit-jobj (open-review-url->json submit-url))
+  (define review-jobj (if review-url
+                          (open-review-url->json review-url)
+                          #f))
+
+  ;; (hash-ref (hash-ref (first review-jobj) 'content) 'recommendation)
+  (when (and review-jobj
+             (not (= (length submit-jobj)
+                     (length review-jobj))))
+    (error "submit and review not equal."))
+  
+  (define papers (open-review-json->papers submit-jobj review-jobj year))
   (string-join (map gen-single-bib papers) "\n"))
 
 (define (gen-iclr year)
   (case year
-    [(2020) (open-review-bib-2020)]))
+    [(2019 2020) (open-review-bib year)]))
 
 ;; https://arxiv.org/list/cs.AI/1905
 ;; https://arxiv.org/list/cs.AI/1905?show=99999

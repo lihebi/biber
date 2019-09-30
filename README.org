@@ -36,6 +36,8 @@ You can also directly get the bib output from
 - [X] arXiv
 - [ ] AAAI 19
 - [X] ICFP 19
+- [X] ICLR 19
+- [X] ICLR 20 submitted papers
 
 ** support major CS conferences
 
@@ -115,3 +117,32 @@ webpages that is fine.
 The pdf cannot be mirrored: they are too large and has copyright
 concern.
 
+
+* ICLR
+
+- https://openreview.net/group?id=ICLR.cc/2020/Conference
+- https://openreview.net/group?id=ICLR.cc/2019/Conference
+
+** 2020 json
+https://openreview.net/notes?invitation=ICLR.cc/2020/Conference/-/Blind_Submission
+this seems to give only 1000, the total number of papers are 2587
+
+2020 is on review phase, only one tag is avaiable.
+I'm going to crawl 4 different kinds of bibs:
+
+- submitted: this is used during review session, and should be
+  removed after that.
+- accepted, oral
+- accepted, poster
+- rejected
+
+** 2019 json
+- https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Blind_Submission&offset=0&limit=1000
+  this is total submitted, no decision. I no longer need this after
+  the result comes out
+- https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Withdrawn_Submission&offset=0&limit=1000
+  this is withdrawn, has its own count
+- https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Paper.*/Meta_Review&offset=0&limit=1000
+  this are all papers, and has a decision, same count as submitted
+  json.  this is for decisions only!! I need the above for the meta
+  data
