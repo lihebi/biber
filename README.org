@@ -34,6 +34,8 @@ You can also directly get the bib output from
 - [ ] IJCAI 19: August 10-16 https://www.ijcai19.org/accepted-papers.html
 - [X] CVPR 19: http://openaccess.thecvf.com/CVPR2019.py
 - [X] arXiv
+  - [ ] stat.ML, e.g. https://arxiv.org/abs/1804.03599
+  - [ ] better loading and upgrading strategy for arXiV
 - [ ] AAAI 19
 - [X] ICFP 19
 - [X] ICLR 19
