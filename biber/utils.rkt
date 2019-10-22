@@ -124,7 +124,7 @@ This function uses open-url-port, and close port automatically."
                                  (last (string-split (first (paper-authors p))))
                                  (title-first-word (paper-title p)))
                            "-")))
-  (define author (string-join (paper-authors p) ", "))
+  (define author (string-join (paper-authors p) " and "))
   (define year (paper-year p))
   (~a "@inproceedings{" id ",\n"
       ;; TODO sometimes the title is all upper case (such as some in
