@@ -35,6 +35,7 @@ You can also directly get the bib output from
 - [X] CVPR 19: http://openaccess.thecvf.com/CVPR2019.py
 - [X] arXiv
   - [ ] stat.ML, e.g. https://arxiv.org/abs/1804.03599
+  - [ ] cs.CL, e.g. https://arxiv.org/abs/1901.06796
   - [ ] better loading and upgrading strategy for arXiV
 - [ ] AAAI 19
 - [X] ICFP 19
