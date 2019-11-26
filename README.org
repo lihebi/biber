@@ -8,6 +8,11 @@ You can install it as a racket package:
 raco pkg install https://github.com/lihebi/biber
 #+END_EXAMPLE
 
+Dependencies:
+- sxml
+- html-parsing
+- roman-numeral
+
 But currently I didn't expose cmd interface. So you will need to use
 the APIs, e.g.
 
