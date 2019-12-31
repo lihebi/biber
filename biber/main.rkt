@@ -34,7 +34,7 @@
 
 
     ;; arxiv
-    (for ([cat (list "cs.AI" "cs.CV" "cs.LG"
+    (for ([cat (list "cs.AI" "cs.CV" "cs.LG" "stat.ML"
                      ;; "cs.PL" "cs.RO"
                      )]
           #:when #t
@@ -42,9 +42,9 @@
           #:when #t
           [month (in-range 1 13)])
       (gen-bib-and-write-arxiv cat year month arxiv-bib))
-    (for ([cat (list "cs.AI" "cs.CV" "cs.LG")]
+    (for ([cat (list "cs.AI" "cs.CV" "cs.LG" "stat.ML")]
           #:when #t
-          [month (in-range 1 11)])
+          [month (in-range 1 12)])
       (gen-bib-and-write-arxiv cat 2019 month arxiv-bib))
     
     (for ([m (in-range 1 13)])
