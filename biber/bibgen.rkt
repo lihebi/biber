@@ -82,6 +82,7 @@
                [(oral) "ICLROral"]
                [(poster) "ICLRPoster"]
                [(reject) "ICLRReject"]
+               [(spotlight) "ICLRSpotlight"]
                [(#f) "ICLRSubmit"]
                [else (error "Decision not recognized: " decision)])
              year)))
@@ -100,15 +101,24 @@ jobj is the submitted paper database. jobj-decision is optional decision databas
                          (values (hash-ref p 'forum) p)))
      ;; 2. go through different decisions, and generate paper
      (define (get-decision p)
-       (let ([dec (hash-ref (hash-ref p 'content) 'recommendation)])
+       (let ([dec
+              (if (hash-has-key? (hash-ref p 'content) 'recommendation)
+                  ;; 2019
+                  (hash-ref (hash-ref p 'content) 'recommendation)
+                  ;; 2020
+                  (hash-ref (hash-ref p 'content) 'decision))])
          (case dec
            [("Reject") 'reject]
            [("Accept (Poster)") 'poster]
            [("Accept (Oral)") 'oral]
+           ;; 2020
+           [("Accept (Talk)") 'oral]
+           ;; 2020
+           [("Accept (Spotlight)") 'spotlight]
            [else (error "Decision not recognized:" dec)])))
      (apply append
             ;; three decisions
-            (for/list ([decision '(oral poster reject)])
+            (for/list ([decision '(oral spotlight poster reject)])
               (let* ([reviews (filter (λ (p) (eq? (get-decision p) decision)) review-jobj)]
                      [papers (for/list ([r reviews])
                                ;; 3. the forum field is what connects the review and paper
@@ -128,14 +138,22 @@ jobj is the submitted paper database. jobj-decision is optional decision databas
                   (hash-ref (url->json url) 'notes))))
 
 (define (open-review-bib year)
-  ;; (define year 2019)
+  ;; (define year 2020)
+  (define url-header "https://openreview.net/notes?invitation=")
+  ;; TODO withdrawn and desk rejected
+  ;; var WITHDRAWN_SUBMISSION_ID = 'ICLR.cc/2020/Conference/-/Withdrawn_Submission';
+  ;; var DESK_REJECTED_SUBMISSION_ID = 'ICLR.cc/2020/Conference/-/Desk_Rejected_Submission';
   (define submit-url (case year
-                       [(2019) "https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Blind_Submission"]
-                       [(2020) "https://openreview.net/notes?invitation=ICLR.cc/2020/Conference/-/Blind_Submission"]
+                       [(2019) (string-append url-header
+                                              "ICLR.cc/2019/Conference/-/Blind_Submission")]
+                       [(2020) (string-append url-header
+                                              "ICLR.cc/2020/Conference/-/Blind_Submission")]
                        [else (error "Open review does not support year:" year)]))
   (define review-url (case year
-                       [(2019) "https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Paper.*/Meta_Review"]
-                       [(2020) #f]))
+                       [(2019) (string-append url-header
+                                              "ICLR.cc/2019/Conference/-/Paper.*/Meta_Review")]
+                       [(2020) (string-append url-header
+                                              "ICLR.cc/2020/Conference/Paper.*/-/Decision")]))
 
   (define submit-jobj (open-review-url->json submit-url))
   (define review-jobj (if review-url
@@ -146,7 +164,9 @@ jobj is the submitted paper database. jobj-decision is optional decision databas
   (when (and review-jobj
              (not (= (length submit-jobj)
                      (length review-jobj))))
-    (error "submit and review not equal."))
+    (error (~a "warning: submit and review not equal: "
+               (length submit-jobj) " vs. "
+               (length review-jobj))))
   
   (define papers (open-review-json->papers submit-jobj review-jobj year))
   (string-join (map gen-single-bib papers) "\n"))
