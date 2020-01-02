@@ -6,7 +6,7 @@
          sxml
          "utils.rkt")
 
-(provide acm-new-conf)
+(provide acm-gen-bib)
 
 (define (get-year str)
   (let ([year (let ([m (regexp-match #rx"[0-9]+" str)])
@@ -95,22 +95,33 @@
                (paper title authors pdflink conf year))))))))
   (string-join (map gen-single-bib papers) "\n"))
 
+(define (acm-conf? conf)
+  (hash-has-key? (acm-new-index) conf))
+
+(define (acm-gen-bib conf year)
+  (case conf
+    [(iccad dac isca ispd popl icfp)
+     (acm-new-conf (string-upcase (symbol->string conf)) year)]
+    #;
+    [(pldi dac isca)
+     (let ([id (acm-lookup-id conf year)])
+       (acm-bib id (string-upcase (symbol->string conf)) year))]
+    ;; [(popl) (gen-popl year)]
+    ;; [(icfp) (gen-icfp year)]
+    [else #f]))
+
 (comment
- (void (acm-new-conf "ICCAD" 2008))
+ (void )
+
+ ;; TODO ISPD?
+ (acm-conf? "ISPD")
 
  (hash-ref h "ICSE")
  (hash-has-key? h "ICCAD")
 
-
- (define xexp (url->xexp "https://dl.acm.org/proceedings"))
- (hash-keys jj)
- (length (hash-ref (hash-ref jj 'data) 'proceedings))
- (call-with-output-file "a.txt" (λ (out)
-                                  (writeln xexp out))
+ (call-with-output-file "a.bib"
+   (λ (out)
+     (displayln (acm-new-conf "ICCAD" 2008) out))
    #:exists 'replace)
- (call-with-output-file "a.xml" (λ (out)
-                                  (displayln (srl:sxml->xml xexp) out))
-   #:exists 'replace)
-  ;; the format string
 
- )
+ #f)

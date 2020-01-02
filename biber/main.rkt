@@ -22,8 +22,10 @@
       (gen-bib-and-write 'isca year))
     (for ([year (in-range 2013 2019)])
       (gen-bib-and-write 'iccad year))
-    (for ([year (in-range 2012 2020)])
+    (for ([year (in-range 2010 2020)])
       (gen-bib-and-write 'dac year))
+    (for ([year (in-range 2016 2019)])
+      (gen-bib-and-write 'ispd year))
 
     ;; PL
     (gen-bib-and-write 'popl 2018)
