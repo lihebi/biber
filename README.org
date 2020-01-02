@@ -1,6 +1,12 @@
 #+TITLE: Biber: Crawl bib from CS conferences
 
-* Install
+
+* Intro
+
+Crawl and parse CS conferences, and outputs bib files.  You can also directly
+get the output bib files at [[https://github.com/lihebi/biber-dist][lihebi/biber-dist]].
+
+* Usage
 
 You can install it as a racket package:
 
@@ -27,130 +33,4 @@ the APIs, e.g.
 See main.rkt for more examples. I haven't tested using it as a package
 though, so there might be some minor problems accessing the APIs.
 
-You can also directly get the bib output from
-[[https://github.com/lihebi/biber-dist][lihebi/biber-dist]]
 
-
-* Features
-
-** New conferences
-- [X] ICML 19: http://proceedings.mlr.press/v97/
-- [X] AISTATS 19: http://proceedings.mlr.press/v89/
-- [ ] IJCAI 19: August 10-16 https://www.ijcai19.org/accepted-papers.html
-- [X] CVPR 19: http://openaccess.thecvf.com/CVPR2019.py
-- [X] arXiv
-  - [ ] stat.ML, e.g. https://arxiv.org/abs/1804.03599
-  - [ ] cs.CL, e.g. https://arxiv.org/abs/1901.06796
-  - [ ] better loading and upgrading strategy for arXiV
-- [ ] AAAI 19
-- [X] ICFP 19
-- [X] ICLR 19
-- [X] ICLR 20 submitted papers
-
-** support major CS conferences
-
-It cost time to download html and generate bib files. You can also
-download the final bib files
-https://github.com/lihebi/smart-scholar-dist
-
-AI conferences
-- [X] NIPS
-- [X] ICML
-- [X] ICLR
-- [ ] neurocomputing https://www.sciencedirect.com/journal/neurocomputing
-- [ ] HotOS
-- [X] ISCA https://dl.acm.org/event.cfm?id=RE239
-- [X] DAC (Design Automation Conference)
-- [X] ICCAD (International Conference On Computer Aided Design)
-- [ ] Journal of Functional Programming
-- [ ] TOPLAS
-
-
-
-- ICLR index: https://iclr.cc/archive/index.html
-- 2013: https://iclr.cc/archive/2013/conference-proceedings.html
-- 2014: https://iclr.cc/archive/2014/conference-proceedings/
-- 2015: https://iclr.cc/archive/www/doku.php%3Fid=iclr2015:accepted-main.html
-- 2016: https://iclr.cc/archive/www/doku.php%3Fid=iclr2016:accepted-main.html
-- open review index: https://openreview.net/group?id=ICLR.cc
-  - TODO workshops
-- 2013 open review: https://openreview.net/group?id=ICLR.cc/2013
-- 2017 open review: https://openreview.net/group?id=ICLR.cc/2017/conference
-- 2018 open review: https://openreview.net/group?id=ICLR.cc/2018/Conference
-- 2019 open reviwe: https://openreview.net/group?id=ICLR.cc/2019/Conference
-
-
-Neural Science
-
-Robotics
-- [X] ICRA: International Conference on Robotics and Automation
-- [X] TRO: IEEE Transactions on Robotics
-- [ ] ICAPS: International Conference on Automated Planning and Scheduling
-- [X] IROS: IEEE/RSJ International Conference on Intelligent Robots and Systems
-
-Image Processing
-- [X] CVPR
-- [X] ICCV
-- [X] ECCV
-
-NLP:
-- [X] CL
-- [X] ACL
-- [X] EACL
-- [X] NAACL
-- [X] EMNLP
-
-Programming Language:
-- [X] PLDI
-- [X] POPL
-
-System:
-- [X] SOSP
-- [X] OSDI
-
-Quantum Computing: TODO
-
-For each of them, the package will manage
-- crawl the website for a bib file list, for each year
-- for each bib entry, figure out what is the pdf link
-- download pdfs automatically, in background
-- do all these at once
-
-Also, I noticed that downloading htmls and pdfs from publishers
-website is likely to be very slow, due to the visit limit of the
-publishers. Thus, I might want to store a git mirror of all webpages
-of these conferences. There might be copyright issues, but I think for
-webpages that is fine.
-
-The pdf cannot be mirrored: they are too large and has copyright
-concern.
-
-
-* ICLR
-
-- https://openreview.net/group?id=ICLR.cc/2020/Conference
-- https://openreview.net/group?id=ICLR.cc/2019/Conference
-
-** 2020 json
-https://openreview.net/notes?invitation=ICLR.cc/2020/Conference/-/Blind_Submission
-this seems to give only 1000, the total number of papers are 2587
-
-2020 is on review phase, only one tag is avaiable.
-I'm going to crawl 4 different kinds of bibs:
-
-- submitted: this is used during review session, and should be
-  removed after that.
-- accepted, oral
-- accepted, poster
-- rejected
-
-** 2019 json
-- https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Blind_Submission&offset=0&limit=1000
-  this is total submitted, no decision. I no longer need this after
-  the result comes out
-- https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Withdrawn_Submission&offset=0&limit=1000
-  this is withdrawn, has its own count
-- https://openreview.net/notes?invitation=ICLR.cc/2019/Conference/-/Paper.*/Meta_Review&offset=0&limit=1000
-  this are all papers, and has a decision, same count as submitted
-  json.  this is for decisions only!! I need the above for the meta
-  data
