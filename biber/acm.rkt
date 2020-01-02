@@ -98,6 +98,18 @@
 (define (acm-conf? conf)
   (hash-has-key? (acm-new-index) conf))
 
+(define (acm-conf-years conf)
+  (define h (acm-new-index))
+  (when (not (hash-has-key? h conf))
+    (error "Conf name not valid."))
+
+  (define j (url->json (~a (hash-ref h "prefix") (hash-ref h conf))))
+  (define year2link (for/hash ([jj (hash-ref (hash-ref j 'data) 'proceedings)])
+                      (values (get-year (hash-ref jj 'title))
+                              (~a "https://dl.acm.org" (hash-ref jj 'link)))))
+  ;; 2. get the year of interest
+  (sort (hash-keys year2link) <))
+
 (define (acm-gen-bib conf year)
   (case conf
     [(iccad dac isca ispd popl icfp)
@@ -115,6 +127,7 @@
 
  ;; TODO ISPD?
  (acm-conf? "ISPD")
+ (acm-conf-years "ISPD")
 
  (hash-ref h "ICSE")
  (hash-has-key? h "ICCAD")
