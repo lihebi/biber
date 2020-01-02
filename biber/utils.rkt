@@ -2,18 +2,25 @@
 
 (require file/sha1
          net/url
+         net/cookies
+         net/head
          json
+         syntax/parse/define
          sxml
          html-parsing
          rackunit)
 
 (provide
  url->xexp
+ my/url->string
  file->xexp
  url->json
  gen-single-bib
- paper)
+ paper
+ comment)
 
+(define-simple-macro (comment stx ...)
+  (void))
 
 (define (port->xexp in)
   (begin0
@@ -22,7 +29,7 @@
 
 (define (string-hash str)
   (string-append (bytes->hex-string (sha1-bytes (open-input-string str)))
-                 "-" (string-replace str "/" "-")))
+                 "-" (substring (string-replace str "/" "-") 0 20)))
 
 (define controlled-port->string
   ;; There is a speed control parameter. By default it is 3/15
@@ -40,6 +47,22 @@
             (port->string in)
           (set! l (take-right (append l (list (current-seconds))) num)))))))
 
+(define (get-cookie url)
+  ;; (cookie-header (string->url "https://lihebi.com"))
+  (when (not (cookie-header (string->url url)))
+    ;; 1. get a cookie
+    (extract-and-save-cookies!
+     (map string->bytes/locale
+          (string-split
+           (purify-port
+            (get-impure-port
+             (string->url url))) "\n"))
+     (string->url url)))
+  ;; get the cookie header
+  (string-append
+   "Cookie: "
+   (bytes->string/locale (cookie-header (string->url url)))))
+
 (define (open-url-port url)
   ;; hash the url
   ;; download to tmp/xxx if does not exist
@@ -51,6 +74,8 @@
       (make-parent-directory* out-fname)
       (let ([in (get-pure-port
                  (string->url url)
+                 ;; get cookie if not available
+                 (list (get-cookie url))
                  #:redirections 5)]
             [out (open-output-file out-fname)])
         (write-string
@@ -59,6 +84,11 @@
         (close-input-port in)
         (close-output-port out)))
     (open-input-file out-fname)))
+
+(define (my/url->string url)
+  (let ([port (open-url-port url)])
+    (begin0 (port->string port)
+      (close-input-port port))))
 
 (define (url->xexp url)
   "Download url to /tmp/xxx and parse it to xexp.
