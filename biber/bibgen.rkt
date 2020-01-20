@@ -33,6 +33,12 @@
   (case year
     [(2019) (pmlr-bib 97 "ICML" 2019)]))
 
+(define (gen-jmlr year)
+  (case year
+    ;; FIXME this is ICML
+    ;; [(2018) (pmlr-bib 80 "JMLR" 2018)]
+    [else (error "not supported")]))
+
 (define (gen-aistats year)
   (case year
     [(2019) (pmlr-bib 89 "AISTATS" 2019)]))
@@ -156,6 +162,7 @@
       (open-review-gen-bib conf year)
       (case conf
         [(icml) (gen-icml year)]
+        [(jmlr) (gen-jmlr year)]
         [(aistats) (gen-aistats year)]
         [(cvpr) (gen-cvpr year)]
         [(naacl) (gen-naacl year)]

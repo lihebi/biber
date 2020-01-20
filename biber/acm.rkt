@@ -76,7 +76,6 @@
   ;; 1. get the number of session
   (define xexp (url->xexp proc-url))
   (define all-headings ((sxpath "//div[contains(@class, 'toc__section')]/a/@id/text()") xexp))
-  (define xx (url->xexp (~a proc-url "?tocHeading=" (eighth all-headings))))
   ;; this is a list of papers
   (define papers
     (apply
@@ -128,6 +127,8 @@
  ;; TODO ISPD?
  (acm-conf? "ISPD")
  (acm-conf-years "ISPD")
+ (acm-conf-years "ICCAD")
+ (acm-conf-years "DAC")
 
  (hash-ref h "ICSE")
  (hash-has-key? h "ICCAD")

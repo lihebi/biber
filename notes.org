@@ -1,5 +1,9 @@
 #+TITLE: Implementation Notes
 
+* TODO-list
+** IEEE
+rewrite python script to racket
+
 * Features
 
 ** New conferences

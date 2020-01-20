@@ -59,9 +59,12 @@
              (string->url url))) "\n"))
      (string->url url)))
   ;; get the cookie header
-  (string-append
-   "Cookie: "
-   (bytes->string/locale (cookie-header (string->url url)))))
+  (let ([c (cookie-header (string->url url))])
+    (if c
+        (string-append
+         "Cookie: "
+         (bytes->string/locale c))
+        "")))
 
 (define (open-url-port url)
   ;; hash the url
@@ -132,7 +135,7 @@ This function uses open-url-port, and close port automatically."
                         (map string-downcase
                              (string-split title #px"\\s+|:|-|\\?|\\(|\\)|/|,|'|\\*|\""))))
   (if (empty? words) (begin
-                       (displayln (format "Warning: title empty " title))
+                       (displayln (~a "Warning: title empty " title))
                        "Title")
       (string-titlecase (first words))))
 
