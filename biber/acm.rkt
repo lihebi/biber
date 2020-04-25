@@ -94,6 +94,12 @@
                (paper title authors pdflink conf year))))))))
   (string-join (map gen-single-bib papers) "\n"))
 
+(define-syntax-rule (myvoid a ...)
+  (void))
+
+(myvoid
+ (acm-new-conf "ICCAD" 2003))
+
 (define (acm-conf? conf)
   (hash-has-key? (acm-new-index) conf))
 

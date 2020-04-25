@@ -20,6 +20,7 @@
     ;; system
     (for ([year (in-range 2015 2020)])
       (gen-bib-and-write 'isca year))
+    (gen-bib-and-write 'iccad 2003)
     (for ([year (in-range 2000 2019)])
       (gen-bib-and-write 'iccad year))
     (for ([year (in-range 2000 2020)])

@@ -19,6 +19,10 @@ Dependencies:
 - html-parsing
 - roman-numeral
 
+#+begin_example
+raco pkg install sxml html-parsing roman-numeral
+#+end_example
+
 But currently I didn't expose cmd interface. So you will need to use
 the APIs, e.g.
 
